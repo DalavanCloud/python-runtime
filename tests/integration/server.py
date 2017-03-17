@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from apiclient.discovery import build
 from functools import wraps
 import json
 import logging
@@ -231,6 +232,24 @@ def _custom():
     return json.dumps(tests), 200
 
 
+@app.route('/debug', methods=['GET'])
+def _debug():
+    debugger_service = build('clouddebugger', 'v2')
+    debugger = debugger_service.debugger()
+    debuggees = debugger.debuggees()
+    l = debuggees.list(clientVersion='google.com/python/v2', includeInactive=True, project='787876332324', x__xgafv='2')
+    response = l.execute()
+    # print response
+    print json.dumps(response, indent=2)
+
+    breakpoints = debuggees.breakpoints()
+    for debuggee in response.get('debuggees'):
+        dId = debuggee.get('id')
+        breakpoints.set(debuggeeId=dId, body='', clientVersion='google.com/python/v2', x__xgafv='2')
+
+    return 'OK', 200
+
+
 class ErrorResponse(Exception):
     status_code = 400
 
@@ -259,4 +278,17 @@ if __name__ == '__main__':
     client = google.cloud.logging.Client()
     client.setup_logging(log_level=logging.DEBUG)
     logging.getLogger().setLevel(logging.DEBUG)
+
+    try:
+        import googleclouddebugger
+        googleclouddebugger.enable(
+            enable_service_account_auth=True,
+            project_id='nick-cloudbuild',
+            project_number='787876332324',
+            service_account_json_file='/usr/local/google/home/nkubala/Downloads/auth.json')
+    except ImportError as e:
+        print('error encoutered when setting up debugger')
+        print(e)
+        sys.exit(1)
+
     app.run(debug=True, port=8080)
