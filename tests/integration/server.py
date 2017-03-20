@@ -234,18 +234,32 @@ def _custom():
 
 @app.route('/debug', methods=['GET'])
 def _debug():
-    debugger_service = build('clouddebugger', 'v2')
-    debugger = debugger_service.debugger()
-    debuggees = debugger.debuggees()
-    l = debuggees.list(clientVersion='google.com/python/v2', includeInactive=True, project='787876332324', x__xgafv='2')
-    response = l.execute()
+    dbg_service = build('clouddebugger', 'v2')
+    dbg = dbg_service.debugger()
+    debuggees_service = dbg.debuggees()
+    debuggees = debuggees_service.list(clientVersion='google.com/python/v2',
+                                       includeInactive=True,
+                                       project='787876332324',
+                                       x__xgafv='2').execute()
     # print response
-    print json.dumps(response, indent=2)
+    print json.dumps(debuggees, indent=2)
 
-    breakpoints = debuggees.breakpoints()
-    for debuggee in response.get('debuggees'):
+    bp_service = debuggees_service.breakpoints()
+    for debuggee in debuggees.get('debuggees'):
         dId = debuggee.get('id')
-        breakpoints.set(debuggeeId=dId, body='', clientVersion='google.com/python/v2', x__xgafv='2')
+        bp_service.set(debuggeeId=dId,
+                       body='',
+                       clientVersion='google.com/python/v2',
+                       x__xgafv='2')
+
+    for debuggee in debuggees.get('debuggees'):
+        dId = debuggee.get('id')
+        bps = bp_service.list(debuggeeId=dId,
+                              includeAllUsers=True,
+                              includeInactive=True,
+                              clientVersion='google.com/python/v2',
+                              x__xgafv='2').execute()
+        print bps
 
     return 'OK', 200
 
