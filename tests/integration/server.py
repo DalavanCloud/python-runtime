@@ -234,76 +234,16 @@ def _custom():
 
 @app.route('/debug', methods=['GET'])
 def _debug():
-    dbg_service = build('clouddebugger', 'v2')
+    x = 5
+    foo = 'bar'
+    if foo is not None:
+        _helper()
+    #TODO: return source and line information
+    return {'path': 'server.py', 'line': 240}, 200
 
-    payload = {
-        "debuggee": {
-            # # "status": {
-            # #     "isError": False
-            # #     # "refersTo": "",
-            # #     # "description": {
-            # #     #     "parameters": [],
-            # #     #     "format": ""
-            # #     # },
-            # # },
-            # # "isDisabled": False,
-            # # "labels": {},
-            # # "uniquifier": "",
-            # "project": "787876332324",
-            # # "sourceContexts": [],
-            # # "extSourceContexts": [],
-            # "agentVersion": "google.com/python/v2",
-            # # "isInactive": False,
-            # # "id": ""
-        }
-    }
 
-    controller = dbg_service.controller().debuggees()
-    # print controller
-
-    dbg = dbg_service.debugger()
-    debuggees_service = dbg.debuggees()
-    debuggees = debuggees_service.list(clientVersion='google.com/python/v2',
-                                       includeInactive=True,
-                                       project='787876332324',
-                                       x__xgafv='2').execute()
-    # print response
-    print '!!!'
-    print 'debuggees!'
-    print json.dumps(debuggees, indent=2)
-
-    debuggee_list = debuggees.get('debuggees', [])
-
-    for debuggee in debuggee_list:
-        controller.register(body={'debuggee': debuggee}).execute()
-        # print 'debuggee registered'
-
-    for debuggee in debuggee_list:
-        dId = debuggee.get('id')
-        bp = controller.breakpoints().list(debuggeeId=dId).execute()
-        print 'breakpoint: '
-        print bp
-
-    bp_service = debuggees_service.breakpoints()
-    # for debuggee in debuggee_list:
-    #     dId = debuggee.get('id')
-    #     bp_service.set(debuggeeId=dId,
-    #                    body='',
-    #                    clientVersion='google.com/python/v2',
-    #                    x__xgafv='2')
-
-    # print 'listing breakpoints'
-    # for debuggee in debuggee_list:
-    #     dId = debuggee.get('id')
-    #     bps = bp_service.list(debuggeeId=dId,
-    #                           includeAllUsers=True,
-    #                           includeInactive=True,
-    #                           clientVersion='google.com/python/v2',
-    #                           x__xgafv='2').execute()
-    #     print 'bps:'
-    #     print bps
-
-    return 'OK', 200
+def _helper():
+    logging.info('This is the debug helper method!')
 
 
 class ErrorResponse(Exception):
