@@ -237,9 +237,9 @@ def _debug():
     x = 5
     foo = 'bar'
     if foo is not None:
-        _helper()
+        _helper() # breakpoint will be set here
     #TODO: return source and line information
-    return {'path': 'server.py', 'line': 240}, 200
+    return json.dumps({'path': 'server.py', 'line': 240}), 200
 
 
 def _helper():
