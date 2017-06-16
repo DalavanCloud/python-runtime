@@ -18,11 +18,14 @@ from apiclient.discovery import build
 from functools import wraps
 import json
 import logging
+import sys
 
 import google.cloud.logging
 import google.cloud.monitoring
 import google.cloud.error_reporting
 import google.cloud.exceptions
+# import google.cloud.debugger
+import googleclouddebugger
 
 from flask import Flask, request, jsonify
 
@@ -239,7 +242,7 @@ def _debug():
     if foo is not None:
         _helper() # breakpoint will be set here
     #TODO: return source and line information
-    return json.dumps({'path': 'server.py', 'line': 240}), 200
+    return json.dumps({'path': 'server.py', 'line': 241}), 200
 
 
 def _helper():
@@ -276,14 +279,16 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.DEBUG)
 
     try:
-        import googleclouddebugger
-        googleclouddebugger.enable(
-            enable_service_account_auth=True,
-            project_id='nick-cloudbuild',
-            project_number='787876332324',
-            service_account_json_file='/usr/local/google/home/nkubala/Downloads/auth.json')
+        # import googleclouddebugger
+        # googleclouddebugger.enable(
+        #     enable_service_account_auth=True,
+        #     project_id='nick-cloudbuild',
+        #     project_number='787876332324')
+        googleclouddebugger.asdf()
+        logging.info('debugger enabled')
+        print 'debugger enabled'
     except ImportError as e:
-        print('error encoutered when setting up debugger')
+        print('error encountered when setting up debugger')
         print(e)
         sys.exit(1)
 

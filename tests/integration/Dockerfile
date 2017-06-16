@@ -19,4 +19,5 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["gunicorn", "-b", ":8080", "--log-level=debug", "--log-file=-", "server:app"]
+ENTRYPOINT ["gunicorn", "-b", ":8080", "--logger-class=logging.Logger", "--log-level=debug", "--log-syslog", "server:app"]
+de
